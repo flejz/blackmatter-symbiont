@@ -5,3 +5,6 @@ build:
 
 run:
 	./main.o
+
+dev:
+	reflex -r "\.[cpp|h]" -s -- bash -c "make build && make run"
