@@ -1,11 +1,11 @@
-run-triangle:
-	g++ triangle.cpp -lglut -lGL -o triangle
-	./triangle
+triangle:
+	g++ triangle.cpp -lglut -lGL -o triangle.out
+	./triangle.out
 	
-run-cube:
-	g++ cube.cpp -lglut -lGL -o cube
-	./cube
+cube:
+	g++ cube.cpp -lglut -lGL -o cube.out
+	./cube.out
 
-run-rotatingCube:
-	g++ rotatingCube.cpp -lglut -lGL -lGLU -o rotatingCube
-	./rotatingCube
+rotatingCube:
+	g++ rotatingCube.cpp -lglut -lGL -lGLU -o rotatingCube.out
+	./rotatingCube.out
