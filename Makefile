@@ -1,4 +1,4 @@
-.PHONY: dev
+.PHONY: dev 
 
 build:
 	g++ main.cpp -o main.o -lglfw3 -lGL -lpthread -ldl -lGLEW
