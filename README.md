@@ -2,4 +2,5 @@ https://learnopengl.com/
 
 current:
 https://learnopengl.com/Getting-started/Hello-Triangle
-Vertex input
+* Vertex input
+* Element Buffer Objects
