@@ -1,7 +1,7 @@
 .PHONY: dev 
 
 build:
-	g++ main.cpp -o main.o -lglfw3 -lGL -lpthread -ldl -lGLEW
+	g++ main.cpp shader.cpp -o main.o -lglfw3 -lGL -lpthread -ldl -lGLEW
 
 run:
 	./main.o

@@ -1,6 +1,12 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <fstream>
 #include <iostream>
+#include <string>
+#include <sstream>
+#include <math.h>
+
+#include "shader.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -44,44 +50,12 @@ int main()
   char infoLog[512];
 
   // vertex shader
-  const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-  unsigned int vertexShader;
-  vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-  if (!success) {
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-  }
+  const std::string vertexShaderSource = parseShader("vertex.glsl");
+  unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
 
   // fragment shader
-  const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}";
-
-  unsigned int fragmentShader;
-  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-
-  if (!success) {
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-  }
+  const std::string fragmentShaderSource = parseShader("fragment.glsl");
+  unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
 
   // shader program
   unsigned int program;
@@ -149,6 +123,14 @@ int main()
 
     // drawing shaders
     glUseProgram(program);
+
+    // update the uniform color
+    float timeValue = glfwGetTime();
+    float greenValue = std::sin(timeValue) / 2.0f + 0.5f;
+    int vertexColorLocation = glGetUniformLocation(program, "ourColor");
+    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+    // render the triangle
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
