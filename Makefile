@@ -7,4 +7,4 @@ run:
 	./main.o
 
 dev:
-	reflex -r "\.[cpp|h]" -s -- bash -c "make build && make run"
+	reflex -r "\.[cpp|h|glsl]" -s -- bash -c "make build && make run"
