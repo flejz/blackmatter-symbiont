@@ -44,16 +44,17 @@ unsigned int compileShader(unsigned int type, const std::string &source) {
 
 void setBool(unsigned int program, const std::string &name, bool value)
 {         
-      glUniform1i(glGetUniformLocation(program, name.c_str()), (int)value); 
+  glUniform1i(glGetUniformLocation(program, name.c_str()), (int)value); 
 }
 
 void setInt(unsigned int program, const std::string &name, int value)
 { 
-      glUniform1i(glGetUniformLocation(program, name.c_str()), value); 
+  std::cout << "location: " << program << glGetUniformLocation(program, name.c_str()) << value << std::endl;
+  glUniform1i(glGetUniformLocation(program, name.c_str()), value); 
 }
 
 void setFloat(unsigned int program, const std::string &name, float value)
 { 
-      glUniform1f(glGetUniformLocation(program, name.c_str()), value); 
+  glUniform1f(glGetUniformLocation(program, name.c_str()), value); 
 } 
 

@@ -1,0 +1,232 @@
+{
+  "id": "c5ea3ed2-f3f0-40a9-8dce-95ecec28b8e2",
+  "version": "2.0",
+  "name": "PFS",
+  "url": "https://servicos.dpf.gov.br",
+  "tests": [{
+    "id": "eb76ec85-bb8d-486b-a98f-6cc4205badc4",
+    "name": "Scheduling Available Spot",
+    "commands": [{
+      "id": "82cf27e9-76fc-43ba-8b9d-4e2a073a7814",
+      "comment": "",
+      "command": "open",
+      "target": "/sinpa/paginaInicialAgendamento.do",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ade87dbb-a61d-409c-b5df-7b7c9a0038f4",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1914x2100",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "fab55073-0555-4c7b-8316-d46d37ebe454",
+      "comment": "",
+      "command": "click",
+      "target": "id=prosseguir",
+      "targets": [
+        ["id=prosseguir", "id"],
+        ["name=Imprimir", "name"],
+        ["css=#prosseguir", "css:finder"],
+        ["xpath=//input[@id='prosseguir']", "xpath:attributes"],
+        ["xpath=//div[@id='content']/div[3]/input", "xpath:idRelative"],
+        ["xpath=//div[3]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ece89122-95e2-46c1-af67-c6d635cbc7fa",
+      "comment": "",
+      "command": "click",
+      "target": "id=cpf",
+      "targets": [
+        ["id=cpf", "id"],
+        ["name=cpf", "name"],
+        ["css=#cpf", "css:finder"],
+        ["xpath=//input[@id='cpf']", "xpath:attributes"],
+        ["xpath=//div[@id='content']/div/div/div/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "df45f714-598e-4d4b-81b7-68e2c35644f7",
+      "comment": "",
+      "command": "type",
+      "target": "id=cpf",
+      "targets": [
+        ["id=cpf", "id"],
+        ["name=cpf", "name"],
+        ["css=#cpf", "css:finder"],
+        ["xpath=//input[@id='cpf']", "xpath:attributes"],
+        ["xpath=//div[@id='content']/div/div/div/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "026.117.258-10"
+    }, {
+      "id": "edc4133c-f5ea-4490-acde-da1c6fbc124d",
+      "comment": "",
+      "command": "click",
+      "target": "id=protocolo",
+      "targets": [
+        ["id=protocolo", "id"],
+        ["name=protocolo", "name"],
+        ["css=#protocolo", "css:finder"],
+        ["xpath=//input[@id='protocolo']", "xpath:attributes"],
+        ["xpath=//div[@id='content']/div/div/div[2]/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "6c29ef05-54ac-4ec1-9a8d-8feabe82053b",
+      "comment": "",
+      "command": "type",
+      "target": "id=protocolo",
+      "targets": [
+        ["id=protocolo", "id"],
+        ["name=protocolo", "name"],
+        ["css=#protocolo", "css:finder"],
+        ["xpath=//input[@id='protocolo']", "xpath:attributes"],
+        ["xpath=//div[@id='content']/div/div/div[2]/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/input", "xpath:position"]
+      ],
+      "value": "1.2021.0000790895"
+    }, {
+      "id": "1f2106b0-8ccf-4d91-91c8-e77b8f3b4cda",
+      "comment": "",
+      "command": "click",
+      "target": "id=dataNascimento",
+      "targets": [
+        ["id=dataNascimento", "id"],
+        ["name=dataNascimento", "name"],
+        ["css=#dataNascimento", "css:finder"],
+        ["xpath=//input[@id='dataNascimento']", "xpath:attributes"],
+        ["xpath=//div[@id='content']/div/div/div[3]/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "7417d20e-e2e2-4eab-b815-e2b0931cc907",
+      "comment": "",
+      "command": "type",
+      "target": "id=dataNascimento",
+      "targets": [
+        ["id=dataNascimento", "id"],
+        ["name=dataNascimento", "name"],
+        ["css=#dataNascimento", "css:finder"],
+        ["xpath=//input[@id='dataNascimento']", "xpath:attributes"],
+        ["xpath=//div[@id='content']/div/div/div[3]/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div[2]/input", "xpath:position"]
+      ],
+      "value": "20/08/1948"
+    }, {
+      "id": "4c826be1-418c-4155-9ce0-da8265642c7e",
+      "comment": "",
+      "command": "click",
+      "target": "name=Prosseguir",
+      "targets": [
+        ["name=Prosseguir", "name"],
+        ["css=.btn:nth-child(1)", "css:finder"],
+        ["xpath=//input[@name='Prosseguir']", "xpath:attributes"],
+        ["xpath=//div[@id='content']/div[2]/div/input", "xpath:idRelative"],
+        ["xpath=//div[3]/div[2]/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "0ef429e4-773d-474a-9e70-9e09fd0fb97e",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=PEP - Aerop. Internacional de São José Dos Campos, SP - PEP - Aerop. Internacional de São José Dos Campos - Jardim Martim Cererê - SÃO JOSÉ DOS CAMPOS - SP",
+      "targets": [
+        ["linkText=PEP - Aerop. Internacional de São José Dos Campos, SP - PEP - Aerop. Internacional de São José Dos Campos - Jardim Martim Cererê - SÃO JOSÉ DOS CAMPOS - SP", "linkText"],
+        ["css=div:nth-child(2) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'PEP - Aerop. Internacional de São José Dos Campos, SP - PEP - Aerop. Internacional de São José Dos Campos - Jardim Martim Cererê - SÃO JOSÉ DOS CAMPOS - SP')]", "xpath:link"],
+        ["xpath=//div[@id='postos']/div/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, \"javascript:processar('16043')\")]", "xpath:href"],
+        ["xpath=//div/div/a", "xpath:position"],
+        ["xpath=//a[contains(.,'PEP - Aerop. Internacional de São José Dos Campos, SP - PEP - Aerop. Internacional de São José Dos Campos - Jardim Martim Cererê - SÃO JOSÉ DOS CAMPOS - SP')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "4838b00e-d954-477a-a8e5-fe321f89996c",
+      "comment": "",
+      "command": "click",
+      "target": "css=.daysrow:nth-child(4) > .day:nth-child(3)",
+      "targets": [
+        ["css=.daysrow:nth-child(4) > .day:nth-child(3)", "css:finder"],
+        ["xpath=//div[@id='calendario']/div/table/tbody/tr[4]/td[3]", "xpath:idRelative"],
+        ["xpath=//tr[4]/td[3]", "xpath:position"],
+        ["xpath=//td[contains(.,'24')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "cc349546-f932-4f90-b6ad-6c1d1fe17b8f",
+      "comment": "",
+      "command": "click",
+      "target": "css=.daysrow:nth-child(3) > .day:nth-child(3)",
+      "targets": [
+        ["css=.daysrow:nth-child(3) > .day:nth-child(3)", "css:finder"],
+        ["xpath=//div[@id='calendario']/div/table/tbody/tr[3]/td[3]", "xpath:idRelative"],
+        ["xpath=//tbody/tr[3]/td[3]", "xpath:position"],
+        ["xpath=//td[contains(.,'17')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "c8aa1fe7-13c9-48df-9d2c-6669563e3c48",
+      "comment": "",
+      "command": "click",
+      "target": "css=.daysrow:nth-child(2) > .day:nth-child(3)",
+      "targets": [
+        ["css=.daysrow:nth-child(2) > .day:nth-child(3)", "css:finder"],
+        ["xpath=//div[@id='calendario']/div/table/tbody/tr[2]/td[3]", "xpath:idRelative"],
+        ["xpath=//tbody/tr[2]/td[3]", "xpath:position"],
+        ["xpath=//td[contains(.,'10')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7fc3b70c-1de8-4551-98ce-e6f7da0efd77",
+      "comment": "",
+      "command": "click",
+      "target": "css=.daysrow:nth-child(1) > .day:nth-child(4)",
+      "targets": [
+        ["css=.daysrow:nth-child(1) > .day:nth-child(4)", "css:finder"],
+        ["xpath=//div[@id='calendario']/div/table/tbody/tr/td[4]", "xpath:idRelative"],
+        ["xpath=//tbody/tr/td[4]", "xpath:position"],
+        ["xpath=//td[contains(.,'4')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "c823e2d7-67f4-4c2b-bef1-3f8a2acb4777",
+      "comment": "",
+      "command": "click",
+      "target": "css=.daysrow:nth-child(1) > .day:nth-child(5)",
+      "targets": [
+        ["css=.daysrow:nth-child(1) > .day:nth-child(5)", "css:finder"],
+        ["xpath=//div[@id='calendario']/div/table/tbody/tr/td[5]", "xpath:idRelative"],
+        ["xpath=//tbody/tr/td[5]", "xpath:position"],
+        ["xpath=//td[contains(.,'5')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ea877373-15df-4f3b-8802-9c5d00d18bf9",
+      "comment": "",
+      "command": "click",
+      "target": "css=.hilite > div",
+      "targets": [
+        ["css=.hilite > div", "css:finder"],
+        ["xpath=//div[@id='calendario']/div/table/thead/tr[2]/td[4]/div", "xpath:idRelative"],
+        ["xpath=//td[4]/div", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "c7a6d3b6-4545-45e8-8e4a-27d2851b7cf6",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["eb76ec85-bb8d-486b-a98f-6cc4205badc4"]
+  }],
+  "urls": ["https://servicos.dpf.gov.br/"],
+  "plugins": []
+}
