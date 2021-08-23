@@ -8,6 +8,7 @@
 
 #include "shader.h"
 #include "stb_image.h"
+#include "texture.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -110,34 +111,6 @@ int main()
     -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
   };
 
-  // >>>>>>>>> TEXTURE <<<<<<<<<
-
-  // texture creation
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // image loading
-  int width, height, channelNumber;
-  unsigned char *data = stbi_load("container.jpg", &width, &height, &channelNumber, 0);
-  
-  if (data)
-  {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  }
-  else 
-  {
-    std::cout << "Failed to load texture" << std::endl;
-  }
-
-  stbi_image_free(data);
-
   // >>>>>>>>> VERTICE ARRAY <<<<<<<<<
   // vertex array object
   unsigned int vao;
@@ -170,6 +143,21 @@ int main()
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
   glEnableVertexAttribArray(2);
 
+  // >>>>>>>>> TEXTURE <<<<<<<<<
+
+  // texture creation
+  unsigned int texture1, texture2;
+
+  stbi_set_flip_vertically_on_load(true);
+  loadJPEG(texture1, "container.jpg");
+  loadPNG(texture2, "bender.png");
+  
+  std::cout << "program: " << program << std::endl;
+
+  glUseProgram(program);
+  setInt(program, "uniTexture1", 0);
+  setInt(program, "uniTexture2", 1);
+
   // telling open gl what and how to interpret data
   /*
   // rainbow 
@@ -194,6 +182,13 @@ int main()
     // rendering commands here
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    // setting respective textures
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
 
     // drawing shaders
     glUseProgram(program);
@@ -225,6 +220,10 @@ int main()
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
+  glDeleteBuffers(1, &ebo);
 
   glfwTerminate();
   return 0;

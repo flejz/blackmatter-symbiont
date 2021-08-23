@@ -10,6 +10,9 @@ https://learnopengl.com/Getting-started/Shaders
 * layout, in and out variables
 * vecn objects
 
-current:
 https://learnopengl.com/Getting-started/Textures
-Texture Units
+* texture loading and orientation
+* texture units to load several textures to the fragment shader
+
+current:
+https://learnopengl.com/Getting-started/Transformations
