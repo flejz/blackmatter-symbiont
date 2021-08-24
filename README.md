@@ -16,3 +16,8 @@ https://learnopengl.com/Getting-started/Textures
 
 current:
 https://learnopengl.com/Getting-started/Transformations
+
+### assets
+
+https://github.com/JoeyDeVries/LearnOpenGL
+https://github.com/JoeyDeVries/Cell/blob/master/cell/mesh/sphere.cpp
