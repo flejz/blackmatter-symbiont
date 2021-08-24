@@ -5,6 +5,9 @@
 #include <string>
 #include <sstream>
 #include <math.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "shader.h"
 #include "stb_image.h"
@@ -76,26 +79,6 @@ int main()
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
 
-  /*
-  // colored vertices
-  float vertices[] = {
-    // vertices          // colors
-     0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-     0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
-  };
-  */
-
-  /*
-  // vertices for element buffer
-  float verticesOld[] = {
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left 
-  };
-  */
-
   // indices for element buffer
   unsigned int indices[] = {  // note that we start from 0!
     0, 1, 3,   // first triangle
@@ -158,25 +141,18 @@ int main()
   setInt(program, "uniTexture1", 0);
   setInt(program, "uniTexture2", 1);
 
-  // telling open gl what and how to interpret data
+  // >>>>>>>>> TRANSFORMATION <<<<<<<<<
   /*
-  // rainbow 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-  */
-
-  /*
-  // colored shading triangle input
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
+  glm::mat4 trans = glm::mat4(1.0f);
+  trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+  trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+  unsigned int transform = glGetUniformLocation(program, "transform");
+  glUniformMatrix4fv(transform, 1, GL_FALSE, glm::value_ptr(trans));
   */
 
   while (!glfwWindowShouldClose(window))
   {
-    /// input
+    // input
     processingInput(window);
 
     // rendering commands here
@@ -190,31 +166,20 @@ int main()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
+    // transformatoin
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+
+    unsigned int transform = glGetUniformLocation(program, "transform");
+    glUniformMatrix4fv(transform, 1, GL_FALSE, glm::value_ptr(trans));
+
     // drawing shaders
     glUseProgram(program);
 
-    /*
-    // update the uniform color
-    float timeValue = glfwGetTime();
-    float greenValue = std::sin(timeValue) / 2.0f + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(program, "ourColor");
-    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-    */
-
+    // drawing vectors
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    /*
-    // render the triangle with vertex array object
-    glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    */
-
-    /*
-    // render the triangle with element buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    */
 
     // check and call events and swap the buffers
     glfwSwapBuffers(window);
