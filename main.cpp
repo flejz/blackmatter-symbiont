@@ -17,15 +17,82 @@
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+// camera
+float deltaTime = 0.0f; // Time between current frame and last frame
+float lastFrame = 0.0f;
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+
+// mouse
+bool firstMouse = true;
+float lastX = SCR_WIDTH / 2;
+float lastY = SCR_HEIGHT / 2;
+
+float yaw, pitch, fov = 45.0f;
+
+// callback
+void processingInput(GLFWwindow* window)
+{
+  const float cameraSpeed = 2.5f * deltaTime; // adjust accordingly
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    cameraPos += cameraSpeed * cameraFront;
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    cameraPos -= cameraSpeed * cameraFront;
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
   glViewport(0, 0, width, height);
 }
 
-void processingInput(GLFWwindow* window)
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, true);
+  fov -= (float)yoffset;
+  std::cout << ">>> here: " << yoffset << "|" << fov << std::endl;
+  if (fov < 1.0f)
+    fov = 1.0f;
+  if (fov > 45.0f)
+    fov = 45.0f;
+}
+
+void mouseCallback(GLFWwindow* window, double x, double y)
+{
+  if (firstMouse)
+  {
+    lastX = x;
+    lastY = y;
+    firstMouse = false;
+  }
+
+  float xoffset = x - lastX;
+  float yoffset = lastY - y; 
+  lastX = x;
+  lastY = y;
+
+  float sensitivity = 0.1f;
+  xoffset *= sensitivity;
+  yoffset *= sensitivity;
+
+  yaw   += xoffset;
+  pitch += yoffset;
+
+  if(pitch > 89.0f)
+    pitch = 89.0f;
+  if(pitch < -89.0f)
+    pitch = -89.0f;
+
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+  direction.y = sin(glm::radians(pitch));
+  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+  cameraFront = glm::normalize(direction);
 }
 
 float vertices[] = {
@@ -110,6 +177,9 @@ int main()
   }
 
   glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+  glfwSetScrollCallback(window, scrollCallback);
+  glfwSetCursorPosCallback(window, mouseCallback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
   glEnable(GL_DEPTH_TEST);
 
@@ -178,20 +248,25 @@ int main()
 
   // >>>>>>>>> 3D <<<<<<<<<
   // transformations
-  glm::mat4 view = glm::mat4(1.0f);
-  glm::mat4 projection;
 
-  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-  projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+  // >>>>>>>>> CAMERA <<<<<<<<<
+  /*
+  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+  glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 
-  unsigned int viewPos = glGetUniformLocation(program, "view");
-  unsigned int projectionPos = glGetUniformLocation(program, "projection");
-
-  glUniformMatrix4fv(viewPos, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(projectionPos, 1, GL_FALSE, glm::value_ptr(projection));
+  glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+  glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+  glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+  */
 
   while (!glfwWindowShouldClose(window))
   {
+    // delta time processment
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
     // input
     processingInput(window);
 
@@ -208,17 +283,21 @@ int main()
     // drawing shaders
     glUseProgram(program);
 
-    // transformation - rotate
-    /*
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));  
-    unsigned int modelPos = glGetUniformLocation(program, "model");
-    glUniformMatrix4fv(modelPos, 1, GL_FALSE, glm::value_ptr(model));
-    */
+    // zoom
+    glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+
+    unsigned int projectionPos = glGetUniformLocation(program, "projection");
+    glUniformMatrix4fv(projectionPos, 1, GL_FALSE, glm::value_ptr(projection));
+
+    // moving camera
+    
+    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+    unsigned int viewPos = glGetUniformLocation(program, "view");
+    glUniformMatrix4fv(viewPos, 1, GL_FALSE, glm::value_ptr(view));
 
     // render container
     glBindVertexArray(vao);
-
 
     for (unsigned int i = 0; i < 10; i++)
     {
