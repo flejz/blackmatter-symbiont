@@ -14,8 +14,10 @@ https://learnopengl.com/Getting-started/Textures
 * texture loading and orientation
 * texture units to load several textures to the fragment shader
 
-current:
 https://learnopengl.com/Getting-started/Transformations
+
+current:
+https://learnopengl.com/Lighting/Basic-Lighting
 
 ### assets
 
