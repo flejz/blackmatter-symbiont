@@ -30,8 +30,14 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	
 float lastFrame = 0.0f;
 
-// lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+// lighting position
+glm::vec3 lightPos(1.2f, 0.0f, 1.0f);
+
+// boxes positions
+float posFactor = 1.2f;
+float squareMatrixLength = 4;
+glm::vec3 box1Pos(0.f, 0.f, 0.f);
+glm::vec3 box2Pos(1.2f, 0.f, 0.f);
 
 int main()
 {
@@ -155,16 +161,16 @@ int main()
 
 
     // current light color
-    glm::vec3 originalColor = glm::vec3(1.0f, 1.0f, 1.0f);
     float degree = 0;
 
     // render loop
     // -----------
-    while (!glfwWindowShouldClose(window))
-    {
-        if (degree > 180.f) {
-            degree = 0.f;
+    while (!glfwWindowShouldClose(window)) {
+        if (degree > 180) {
+            degree = 0;
         }
+
+        float sin = colors::csin(degree);
 
         // per-frame time logic
         // --------------------
@@ -173,8 +179,10 @@ int main()
         lastFrame = currentFrame;
 
         // change light color
-        float sin = colors::csin(degree) * 0.5f;
-        glm::vec3 lightColor = glm::vec3(sin, 1.0f, 1 - sin);
+        glm::vec3 lightColor(0, sin, 1 - sin);
+
+        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); 
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); 
 
         // input
         // -----
@@ -192,6 +200,15 @@ int main()
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
 
+        lightingShader.setVec3("light.ambient",  ambientColor);
+        lightingShader.setVec3("light.diffuse",  diffuseColor); // darken diffuse light a bit
+        lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f); 
+
+        lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        lightingShader.setFloat("material.shininess", 32.0f);
+
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
@@ -199,7 +216,19 @@ int main()
         lightingShader.setMat4("view", view);
 
         // world transformation
+        glm::vec3 box1Pos(0.f, 0.f, 0.f);
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, box1Pos);
+        lightingShader.setMat4("model", model);
+
+        // render the cube
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // world transformation
+        glm::vec3 box2Pos(1.2f, 0.f, 0.f);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, box2Pos);
         lightingShader.setMat4("model", model);
 
         // render the cube
@@ -214,7 +243,7 @@ int main()
         lightCubeShader.setMat4("view", view);
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        model = glm::scale(model, glm::vec3(10.f)); // a smaller cube
         lightCubeShader.setMat4("model", model);
 
         glBindVertexArray(lightCubeVAO);
