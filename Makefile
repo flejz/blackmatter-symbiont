@@ -1,7 +1,7 @@
 .PHONY: dev 
 
 build:
-	g++ *.cpp -omain.o -lglfw3 -lGL -lpthread -ldl -lGLEW
+	g++ *.cpp include/*.cpp -omain.o -lglfw3 -lGL -lpthread -ldl -lGLEW
 
 run:
 	./main.o
