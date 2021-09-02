@@ -1,0 +1,11 @@
+Model Information:
+* title:	Sphere curve 37
+* source:	https://sketchfab.com/3d-models/sphere-curve-37-50b2b2cb0b0f4e068729d46355f3c66f
+* author:	bjorn.mutzel (https://sketchfab.com/bjorn.mutzel)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Sphere curve 37" (https://sketchfab.com/3d-models/sphere-curve-37-50b2b2cb0b0f4e068729d46355f3c66f) by bjorn.mutzel (https://sketchfab.com/bjorn.mutzel) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

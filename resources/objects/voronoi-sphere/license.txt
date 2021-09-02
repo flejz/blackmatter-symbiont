@@ -1,0 +1,11 @@
+Model Information:
+* title:	Stereographic Voronoi Sphere
+* source:	https://sketchfab.com/3d-models/stereographic-voronoi-sphere-a55e9b64cab045c4b06069c9127ece5b
+* author:	sc8di (https://sketchfab.com/sc8di)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Stereographic Voronoi Sphere" (https://sketchfab.com/3d-models/stereographic-voronoi-sphere-a55e9b64cab045c4b06069c9127ece5b) by sc8di (https://sketchfab.com/sc8di) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

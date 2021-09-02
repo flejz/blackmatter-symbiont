@@ -49,7 +49,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Learning OpenGL", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -81,10 +81,12 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    Shader ourShader("1.model_loading.vs", "1.model_loading.fs");
+    Shader lightCubeShader("light_cube.vs", "light_cube.fs");
+    Shader ourShader("model_material_light.vs", "model_material_light.fs");
 
     // load models
     // -----------
+    Model lightCubeModel(FileSystem::getPath("resources/objects/sphere/scene.gltf"));
     Model ourModel(FileSystem::getPath("resources/objects/scifi_hexsphere/scene.gltf"));
 
     
@@ -122,9 +124,14 @@ int main()
         ourShader.setVec3("light.diffuse", diffuseColor);
         ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
+        ourShader.setFloat("light.constant", 1.0f);
+        ourShader.setFloat("light.linear", 0.09f);
+        ourShader.setFloat("light.quadratic", 0.032f);
+
+
         // material properties
-        ourShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-        ourShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        ourShader.setVec3("material.ambient", 0.9f, 0.9f, 0.9f);
+        ourShader.setVec3("material.diffuse", 0.9f, 0.9f, 0.9f);
         ourShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular our doesn't have full effect on this object's material
         ourShader.setFloat("material.shininess", 32.0f);
 
@@ -135,12 +142,24 @@ int main()
         ourShader.setMat4("view", view);
 
         // render the loaded model
+        float scaleFactor = 1.f;
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
         // model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        model = glm::scale(model, scaleFactor * glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
+
+        // also draw the lamp object
+        lightCubeShader.use();
+        lightCubeShader.setMat4("projection", projection);
+        lightCubeShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.02f)); // a smaller cube
+        lightCubeShader.setMat4("model", model);
+        lightCubeModel.Draw(lightCubeShader);
+
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
