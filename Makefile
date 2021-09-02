@@ -1,7 +1,7 @@
 .PHONY: normalize dev 
 
 build:
-	g++ *.cpp include/*.cpp -omain.o -lglfw3 -lGL -lpthread -ldl -lGLEW
+	g++ *.cpp include/*.cpp -omain.o -lglfw3 -lGL -lpthread -ldl -lGLEW -lassimp
 
 run: build
 	./main.o
