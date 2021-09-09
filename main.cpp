@@ -17,6 +17,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
+string lightGen(int i, std::string prop) {
+    string number = to_string(i);
+    return ("lights[" + number + "]." + prop).c_str();
+}
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -32,7 +37,33 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPositions[] = {
+    glm::vec3(0.0f, -1.0f, 3.0f),
+    glm::vec3(1.0f, -1.0f, 3.0f),
+    glm::vec3(2.0f, -1.0f, 3.0f),
+    glm::vec3(3.0f, -1.0f, 3.0f),
+    glm::vec3(4.0f, -1.0f, 3.0f),
+    glm::vec3(5.0f, -1.0f, 3.0f),
+    glm::vec3(6.0f, -1.0f, 3.0f),
+    glm::vec3(7.0f, -1.0f, 3.0f),
+    glm::vec3(0.0f, 0.0f, 3.0f),
+    glm::vec3(1.0f, 0.0f, 3.0f),
+    glm::vec3(2.0f, 0.0f, 3.0f),
+    glm::vec3(3.0f, 0.0f, 3.0f),
+    glm::vec3(4.0f, 0.0f, 3.0f),
+    glm::vec3(5.0f, 0.0f, 3.0f),
+    glm::vec3(6.0f, 0.0f, 3.0f),
+    glm::vec3(7.0f, 0.0f, 3.0f),
+    glm::vec3(0.0f, 1.0f, 3.0f),
+    glm::vec3(1.0f, 1.0f, 3.0f),
+    glm::vec3(2.0f, 1.0f, 3.0f),
+    glm::vec3(3.0f, 1.0f, 3.0f),
+    glm::vec3(4.0f, 1.0f, 3.0f),
+    glm::vec3(5.0f, 1.0f, 3.0f),
+    glm::vec3(6.0f, 1.0f, 3.0f),
+    glm::vec3(7.0f, 1.0f, 3.0f),
+};
+int lightPositionsCount = sizeof(lightPositions) / sizeof(glm::vec3);
 
 int main()
 {
@@ -81,13 +112,13 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    Shader lightCubeShader("light_cube.vs", "light_cube.fs");
-    Shader ourShader("model_material_light.vs", "model_material_light.fs");
+    Shader lightShader("light_cube.vs", "light_cube.fs");
+    Shader sphereShader("model_material_light.vs", "model_material_light.fs");
 
     // load models
     // -----------
-    Model lightCubeModel(FileSystem::getPath("resources/objects/sphere/scene.gltf"));
-    Model ourModel(FileSystem::getPath("resources/objects/scifi_hexsphere/scene.gltf"));
+    Model lightModel(FileSystem::getPath("resources/objects/sphere/scene.gltf"));
+    Model sphereModel(FileSystem::getPath("resources/objects/scifi_hexsphere/scene.gltf"));
 
     
     // draw in wireframe
@@ -112,53 +143,70 @@ int main()
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // variables
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 model;
+
         // don't forget to enable shader before setting uniforms
-        ourShader.use();
-        ourShader.setVec3("light.position", lightPos);
-        ourShader.setVec3("viewPos", camera.Position);
+        sphereShader.use();
+        sphereShader.setVec3("viewPos", camera.Position);
 
+        // ****** LIGHT
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // decrease the influence
-        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
-        ourShader.setVec3("light.ambient", ambientColor);
-        ourShader.setVec3("light.diffuse", diffuseColor);
-        ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.3f); // decrease the influence
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.08f); // low influence
 
-        ourShader.setFloat("light.constant", 1.0f);
-        ourShader.setFloat("light.linear", 0.09f);
-        ourShader.setFloat("light.quadratic", 0.032f);
+        for (int i = 0; i < lightPositionsCount; i++)
+        {
+            string number = to_string(i);
+            glm::vec3 lightPos = lightPositions[i];
+            
+            sphereShader.setVec3(lightGen(i, "position"), lightPos);
+            sphereShader.setVec3(lightGen(i, "ambient"), ambientColor);
+            sphereShader.setVec3(lightGen(i, "diffuse"), diffuseColor);
+            sphereShader.setVec3(lightGen(i, "specular"), 1.0f, 1.0f, 1.0f);
+
+            sphereShader.setFloat(lightGen(i, "constant"), 1.0f);
+            sphereShader.setFloat(lightGen(i, "linear"), 0.09f);
+            sphereShader.setFloat(lightGen(i, "quadratic"), 0.032f);
+        }
+        
 
 
         // material properties
-        ourShader.setVec3("material.ambient", 0.9f, 0.9f, 0.9f);
-        ourShader.setVec3("material.diffuse", 0.9f, 0.9f, 0.9f);
-        ourShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular our doesn't have full effect on this object's material
-        ourShader.setFloat("material.shininess", 32.0f);
+        sphereShader.setVec3("material.ambient", 0.9f, 0.9f, 0.9f);
+        sphereShader.setVec3("material.diffuse", 0.9f, 0.9f, 0.9f);
+        sphereShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular our doesn't have full effect on this object's material
+        sphereShader.setFloat("material.shininess", 32.0f);
 
         // view/projection transformations
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
+        sphereShader.setMat4("projection", projection);
+        sphereShader.setMat4("view", view);
 
         // render the loaded model
         float scaleFactor = 1.f;
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -10.0f)); // translate it down so it's at the center of the scene
         // model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
         model = glm::scale(model, scaleFactor * glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        ourShader.setMat4("model", model);
-        ourModel.Draw(ourShader);
+        sphereShader.setMat4("model", model);
+        sphereModel.Draw(sphereShader);
 
-        // also draw the lamp object
-        lightCubeShader.use();
-        lightCubeShader.setMat4("projection", projection);
-        lightCubeShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.02f)); // a smaller cube
-        lightCubeShader.setMat4("model", model);
-        lightCubeModel.Draw(lightCubeShader);
+        for (int i = 0; i < lightPositionsCount; i++)
+        {
+            glm::vec3 lightPos = lightPositions[i];
+
+            // also draw the lamp object
+            lightShader.use();
+            lightShader.setMat4("projection", projection);
+            lightShader.setMat4("view", view);
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, lightPos);
+            model = glm::scale(model, glm::vec3(0.02f)); // a smaller cube
+            lightShader.setMat4("model", model);
+            lightModel.Draw(lightShader);
+        }
 
 
 
