@@ -1,5 +1,5 @@
 #version 330 core
-#define NR_LIGHT_ROW 12
+#define NR_LIGHT_ROW 11
 #define NR_LIGHTS NR_LIGHT_ROW * NR_LIGHT_ROW
 struct Material {
     vec3 ambient;

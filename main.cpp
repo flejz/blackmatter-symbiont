@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-#define NR_LIGHT_ROW 13
+#define NR_LIGHT_ROW 39
 #define NR_LIGHT_MID NR_LIGHT_ROW / 2
 #define NR_LIGHTS NR_LIGHT_ROW * NR_LIGHT_ROW
 #define NR_SPHERE_ROW 13
@@ -27,7 +27,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 // camera
-Camera camera(glm::vec3(0.f, 10.0f, 20.0f));
+Camera camera(glm::vec3(0.f, NR_LIGHT_MID, NR_SPHERE_MID + 10));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -46,7 +46,7 @@ glm::vec3* genLightPositions() {
     static glm::vec3 pos[NR_LIGHTS];
     for (int i = 0; i < NR_LIGHT_ROW; i++) 
         for (int j = 0; j < NR_LIGHT_ROW; j++)
-            pos[(i * NR_LIGHT_ROW) + j] = glm::vec3((float)i - NR_LIGHT_MID, (float)j, -10.0f);
+            pos[(i * NR_LIGHT_ROW) + j] = glm::vec3((float)i - NR_LIGHT_MID, (float)j, -20.0f);
 
     return pos;
 }
@@ -58,7 +58,7 @@ glm::vec3* genSphereInitPositions() {
     static glm::vec3 pos[NR_SPHERES];
     for (int i = 0; i < NR_SPHERE_ROW; i++) 
         for (int j = 0; j < NR_SPHERE_ROW; j++)
-            pos[(i * NR_SPHERE_ROW) + j] = glm::vec3((float)i - NR_SPHERE_MID, NR_SPHERE_MID, (float)j - NR_SPHERE_MID);
+            pos[(i * NR_SPHERE_ROW) + j] = glm::vec3((float)i - NR_SPHERE_MID, NR_LIGHT_MID, (float)j - NR_SPHERE_MID);
 
     return pos;
 }
@@ -124,6 +124,11 @@ int main()
     
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
+
+    // check the max quantity of uniform vectors available
+    int maxUniformVectors;
+    glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS, &maxUniformVectors);
 
     // render loop
     // -----------
@@ -141,7 +146,7 @@ int main()
 
         // render
         // ------
-        glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+        glClearColor(0.02f, 0.02f, 0.02f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // variables
@@ -153,8 +158,11 @@ int main()
         sphereShader.use();
         sphereShader.setVec3("viewPos", camera.Position);
 
+        float red = glm::abs(sin(glfwGetTime()));
+        red = red > 0.8f ? 0.8f : red < 0.15f ? 0.15f : red;
+
         // ****** LIGHT
-        glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+        glm::vec3 lightColor(red, 0.0f, 0.0f);
         glm::vec3 diffuseColor = lightColor   * glm::vec3(0.15f); // decrease the influence
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.08f); // low influence
 
@@ -165,7 +173,7 @@ int main()
             sphereShader.setVec3(genLightPositionString(i, "position"), lightPos);
             sphereShader.setVec3(genLightPositionString(i, "ambient"), ambientColor);
             sphereShader.setVec3(genLightPositionString(i, "diffuse"), diffuseColor);
-            sphereShader.setVec3(genLightPositionString(i, "specular"), 1.0f, 1.0f, 1.0f);
+            sphereShader.setVec3(genLightPositionString(i, "specular"), lightColor);
 
             sphereShader.setFloat(genLightPositionString(i, "constant"), 1.0f);
             sphereShader.setFloat(genLightPositionString(i, "linear"), 0.09f);
@@ -173,7 +181,7 @@ int main()
         }
 
         // material properties
-        sphereShader.setVec3("material.ambient", 0.9f, 0.9f, 0.9f);
+        sphereShader.setVec3("material.ambient", 0.7f, 0.7f, 0.7f);
         sphereShader.setVec3("material.diffuse", 0.9f, 0.9f, 0.9f);
         sphereShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular our doesn't have full effect on this object's material
         sphereShader.setFloat("material.shininess", 32.0f);
@@ -183,49 +191,36 @@ int main()
         sphereShader.setMat4("view", view);
 
         float rotationAngle = glm::radians(45.0f);
-        float scaleFactor = 0.4f;
 
         // render spheres
+        float sphereScaleFactor = 0.4f;
         for (int i = 0; i < NR_SPHERES; i++) 
         {
             glm::vec3 spherePos = *(spherePositions + i);
             spherePos.y += sin(glfwGetTime() + i); // diagonal
             // spherePos.y += sin(glfwGetTime() + i / NR_SPHERE_ROW); // horizonal
 
-            glm::mat3x3 rotationMatrixZ(
-                    cos(rotationAngle), -sin(rotationAngle), 0,
-                    sin(rotationAngle),  cos(rotationAngle), 0,
-                                     0,                   0, 1
-            );
-
-            glm::mat3x3 rotationMatrixY(
-                    cos(rotationAngle), 0, sin(rotationAngle),
-                                     0, 1,                  0,
-                   -sin(rotationAngle), 0, cos(rotationAngle)
-            );
-
-            // spherePos = spherePos * rotationMatrixY;
-
             model = glm::mat4(1.0f);
             model = glm::rotate(model, rotationAngle, glm::vec3(0, 1, 0));
-    
             model = glm::translate(model, spherePos); // translate it down so it's at the center of the scene
-            model = glm::scale(model, glm::vec3(scaleFactor));	// it's a bit too big for our scene, so scale it down
+            model = glm::scale(model, glm::vec3(sphereScaleFactor));	// it's a bit too big for our scene, so scale it down
             sphereShader.setMat4("model", model);
             sphereModel.Draw(sphereShader);
         }
 
         // draw the light sources
+        float lightScaleFactor = 0.045f;
         for (int i = 0; i < NR_LIGHTS; i++)
         {
             glm::vec3 lightPos = *(lightPositions + i);
 
             lightShader.use();
+            lightShader.setVec3("lightColor", lightColor);
             lightShader.setMat4("projection", projection);
             lightShader.setMat4("view", view);
             model = glm::mat4(1.0f);
             model = glm::translate(model, lightPos);
-            model = glm::scale(model, glm::vec3(0.02f)); // a smaller cube
+            model = glm::scale(model, glm::vec3(lightScaleFactor));
             lightShader.setMat4("model", model);
             lightModel.Draw(lightShader);
         }
