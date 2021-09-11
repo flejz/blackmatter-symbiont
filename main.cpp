@@ -12,22 +12,22 @@
 
 #include <iostream>
 
+#define NR_LIGHT_ROW 13
+#define NR_LIGHT_MID NR_LIGHT_ROW / 2
+#define NR_LIGHTS NR_LIGHT_ROW * NR_LIGHT_ROW
+#define NR_SPHERE_ROW 13
+#define NR_SPHERE_MID NR_SPHERE_ROW / 2
+#define NR_SPHERES NR_SPHERE_ROW * NR_SPHERE_ROW
+#define SCR_WIDTH 1920
+#define SCR_HEIGHT 1080
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-string lightGen(int i, std::string prop) {
-    string number = to_string(i);
-    return ("lights[" + number + "]." + prop).c_str();
-}
-
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.f, 10.0f, 20.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -36,37 +36,38 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-// lighting
-glm::vec3 lightPositions[] = {
-    glm::vec3(0.0f, -1.0f, 3.0f),
-    glm::vec3(1.0f, -1.0f, 3.0f),
-    glm::vec3(2.0f, -1.0f, 3.0f),
-    glm::vec3(3.0f, -1.0f, 3.0f),
-    glm::vec3(4.0f, -1.0f, 3.0f),
-    glm::vec3(5.0f, -1.0f, 3.0f),
-    glm::vec3(6.0f, -1.0f, 3.0f),
-    glm::vec3(7.0f, -1.0f, 3.0f),
-    glm::vec3(0.0f, 0.0f, 3.0f),
-    glm::vec3(1.0f, 0.0f, 3.0f),
-    glm::vec3(2.0f, 0.0f, 3.0f),
-    glm::vec3(3.0f, 0.0f, 3.0f),
-    glm::vec3(4.0f, 0.0f, 3.0f),
-    glm::vec3(5.0f, 0.0f, 3.0f),
-    glm::vec3(6.0f, 0.0f, 3.0f),
-    glm::vec3(7.0f, 0.0f, 3.0f),
-    glm::vec3(0.0f, 1.0f, 3.0f),
-    glm::vec3(1.0f, 1.0f, 3.0f),
-    glm::vec3(2.0f, 1.0f, 3.0f),
-    glm::vec3(3.0f, 1.0f, 3.0f),
-    glm::vec3(4.0f, 1.0f, 3.0f),
-    glm::vec3(5.0f, 1.0f, 3.0f),
-    glm::vec3(6.0f, 1.0f, 3.0f),
-    glm::vec3(7.0f, 1.0f, 3.0f),
-};
-int lightPositionsCount = sizeof(lightPositions) / sizeof(glm::vec3);
+string genLightPositionString(int i, std::string prop) {
+    string number = to_string(i);
+    return ("lights[" + number + "]." + prop).c_str();
+}
+
+// light positions
+glm::vec3* genLightPositions() {
+    static glm::vec3 pos[NR_LIGHTS];
+    for (int i = 0; i < NR_LIGHT_ROW; i++) 
+        for (int j = 0; j < NR_LIGHT_ROW; j++)
+            pos[(i * NR_LIGHT_ROW) + j] = glm::vec3((float)i - NR_LIGHT_MID, (float)j, -10.0f);
+
+    return pos;
+}
+
+glm::vec3* lightPositions = genLightPositions();
+
+// sphere positions
+glm::vec3* genSphereInitPositions() {
+    static glm::vec3 pos[NR_SPHERES];
+    for (int i = 0; i < NR_SPHERE_ROW; i++) 
+        for (int j = 0; j < NR_SPHERE_ROW; j++)
+            pos[(i * NR_SPHERE_ROW) + j] = glm::vec3((float)i - NR_SPHERE_MID, NR_SPHERE_MID, (float)j - NR_SPHERE_MID);
+
+    return pos;
+}
+
+glm::vec3* spherePositions = genSphereInitPositions();
 
 int main()
 {
+    
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -80,7 +81,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Learning OpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Dark Matter", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -99,7 +100,7 @@ int main()
     // ---------------------------------------
     if (glewInit() != GLEW_OK)
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        std::cout << "Failed to initialize GLEW" << std::endl;
         return -1;
     }
 
@@ -154,25 +155,22 @@ int main()
 
         // ****** LIGHT
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.3f); // decrease the influence
+        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.15f); // decrease the influence
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.08f); // low influence
 
-        for (int i = 0; i < lightPositionsCount; i++)
+        for (int i = 0; i < NR_LIGHTS; i++)
         {
-            string number = to_string(i);
-            glm::vec3 lightPos = lightPositions[i];
-            
-            sphereShader.setVec3(lightGen(i, "position"), lightPos);
-            sphereShader.setVec3(lightGen(i, "ambient"), ambientColor);
-            sphereShader.setVec3(lightGen(i, "diffuse"), diffuseColor);
-            sphereShader.setVec3(lightGen(i, "specular"), 1.0f, 1.0f, 1.0f);
+            glm::vec3 lightPos = *(lightPositions + i);
 
-            sphereShader.setFloat(lightGen(i, "constant"), 1.0f);
-            sphereShader.setFloat(lightGen(i, "linear"), 0.09f);
-            sphereShader.setFloat(lightGen(i, "quadratic"), 0.032f);
+            sphereShader.setVec3(genLightPositionString(i, "position"), lightPos);
+            sphereShader.setVec3(genLightPositionString(i, "ambient"), ambientColor);
+            sphereShader.setVec3(genLightPositionString(i, "diffuse"), diffuseColor);
+            sphereShader.setVec3(genLightPositionString(i, "specular"), 1.0f, 1.0f, 1.0f);
+
+            sphereShader.setFloat(genLightPositionString(i, "constant"), 1.0f);
+            sphereShader.setFloat(genLightPositionString(i, "linear"), 0.09f);
+            sphereShader.setFloat(genLightPositionString(i, "quadratic"), 0.032f);
         }
-        
-
 
         // material properties
         sphereShader.setVec3("material.ambient", 0.9f, 0.9f, 0.9f);
@@ -184,20 +182,44 @@ int main()
         sphereShader.setMat4("projection", projection);
         sphereShader.setMat4("view", view);
 
-        // render the loaded model
-        float scaleFactor = 1.f;
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -10.0f)); // translate it down so it's at the center of the scene
-        // model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-        model = glm::scale(model, scaleFactor * glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        sphereShader.setMat4("model", model);
-        sphereModel.Draw(sphereShader);
+        float rotationAngle = glm::radians(45.0f);
+        float scaleFactor = 0.4f;
 
-        for (int i = 0; i < lightPositionsCount; i++)
+        // render spheres
+        for (int i = 0; i < NR_SPHERES; i++) 
         {
-            glm::vec3 lightPos = lightPositions[i];
+            glm::vec3 spherePos = *(spherePositions + i);
+            spherePos.y += sin(glfwGetTime() + i); // diagonal
+            // spherePos.y += sin(glfwGetTime() + i / NR_SPHERE_ROW); // horizonal
 
-            // also draw the lamp object
+            glm::mat3x3 rotationMatrixZ(
+                    cos(rotationAngle), -sin(rotationAngle), 0,
+                    sin(rotationAngle),  cos(rotationAngle), 0,
+                                     0,                   0, 1
+            );
+
+            glm::mat3x3 rotationMatrixY(
+                    cos(rotationAngle), 0, sin(rotationAngle),
+                                     0, 1,                  0,
+                   -sin(rotationAngle), 0, cos(rotationAngle)
+            );
+
+            // spherePos = spherePos * rotationMatrixY;
+
+            model = glm::mat4(1.0f);
+            model = glm::rotate(model, rotationAngle, glm::vec3(0, 1, 0));
+    
+            model = glm::translate(model, spherePos); // translate it down so it's at the center of the scene
+            model = glm::scale(model, glm::vec3(scaleFactor));	// it's a bit too big for our scene, so scale it down
+            sphereShader.setMat4("model", model);
+            sphereModel.Draw(sphereShader);
+        }
+
+        // draw the light sources
+        for (int i = 0; i < NR_LIGHTS; i++)
+        {
+            glm::vec3 lightPos = *(lightPositions + i);
+
             lightShader.use();
             lightShader.setMat4("projection", projection);
             lightShader.setMat4("view", view);
@@ -207,8 +229,6 @@ int main()
             lightShader.setMat4("model", model);
             lightModel.Draw(lightShader);
         }
-
-
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

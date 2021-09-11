@@ -32,3 +32,6 @@ https://sketchfab.com/3d-models/sphere-design-79d172a4508c4e26b39660e07b90bb13
 https://sketchfab.com/3d-models/carbon-60-sphere-5ef45e632eb8431998400ea73ddc51a5
 https://sketchfab.com/3d-models/scifi-hexsphere-cb364832b9994b768dba6245e6b3f51b
 https://sketchfab.com/3d-models/geodesic-1da7711c55a64c6ea55d3499822d6ac2
+
+### c meanings
+https://cdecl.org/
