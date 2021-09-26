@@ -25,9 +25,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+string genLightPositionString(int i, std::string prop);
 
 // camera
-Camera camera(glm::vec3(0.f, NR_LIGHT_MID, NR_SPHERE_MID + 10));
+Camera camera(glm::vec3(0.f, NR_LIGHT_MID, NR_SPHERE_MID + 7));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -36,40 +37,24 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-string genLightPositionString(int i, std::string prop) {
-    string number = to_string(i);
-    return ("lights[" + number + "]." + prop).c_str();
-}
-
-// light positions
-glm::vec3* genLightPositions() {
-    static glm::vec3 pos[NR_LIGHTS];
-    for (int i = 0; i < NR_LIGHT_ROW; i++) 
-        for (int j = 0; j < NR_LIGHT_ROW; j++)
-            pos[(i * NR_LIGHT_ROW) + j] = glm::vec3((float)i - NR_LIGHT_MID, (float)j, -20.0f);
-
-    return pos;
-}
-
-glm::vec3* lightPositions = genLightPositions();
-
-// sphere positions
-glm::vec3* genSphereInitPositions() {
-    static glm::vec3 pos[NR_SPHERES];
-    for (int i = 0; i < NR_SPHERE_ROW; i++) 
-        for (int j = 0; j < NR_SPHERE_ROW; j++)
-            pos[(i * NR_SPHERE_ROW) + j] = glm::vec3((float)i - NR_SPHERE_MID, NR_LIGHT_MID, (float)j - NR_SPHERE_MID);
-
-    return pos;
-}
-
-glm::vec3* spherePositions = genSphereInitPositions();
+// global variables
+glm::vec3* lightPositions = (glm::vec3*)malloc(NR_LIGHTS * sizeof(glm::vec3));
+glm::vec3* spherePositions = (glm::vec3*)malloc(NR_SPHERES * sizeof(glm::vec3));
 
 int main()
 {
+    // fill up light and sphere positions
+    for (int i = 0; i < NR_LIGHT_ROW; i++) 
+        for (int j = 0; j < NR_LIGHT_ROW; j++)
+            *(lightPositions + (i * NR_LIGHT_ROW) + j) = glm::vec3((float)i - NR_LIGHT_MID, (float)j, -20.0f);
+
+    for (int i = 0; i < NR_SPHERE_ROW; i++) {
+        for (int j = 0; j < NR_SPHERE_ROW; j++)
+            *(spherePositions + (i * NR_SPHERE_ROW) + j) = glm::vec3((float)i - NR_SPHERE_MID, NR_LIGHT_MID, (float)j - NR_SPHERE_MID);
+    }
     
     // glfw: initialize and configure
-    // ------------------------------
+    
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -80,7 +65,21 @@ int main()
 #endif
 
     // glfw window creation
-    // --------------------
+    int monitorCount = 0;
+    GLFWmonitor* monitor;
+    GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+
+    /*
+    // monitor list
+    for (int i = 0; i < monitorCount; i++) {
+        monitor = *(monitors + i);
+    }
+    */
+
+    if (monitorCount > 0)
+        monitor = *(monitors + (monitorCount - 1));
+    
+    // GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Dark Matter", monitor, NULL);
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Dark Matter", NULL, NULL);
     if (window == NULL)
     {
@@ -96,8 +95,7 @@ int main()
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
+    // glew: load all OpenGL function pointers
     if (glewInit() != GLEW_OK)
     {
         std::cout << "Failed to initialize GLEW" << std::endl;
@@ -108,45 +106,41 @@ int main()
     stbi_set_flip_vertically_on_load(true);
 
     // configure global opengl state
-    // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
     // build and compile shaders
-    // -------------------------
-    Shader lightShader("light_cube.vs", "light_cube.fs");
+    // Shader lightShader("light_cube.vs", "light_cube.fs");
     Shader sphereShader("model_material_light.vs", "model_material_light.fs");
 
     // load models
-    // -----------
-    Model lightModel(FileSystem::getPath("resources/objects/sphere/scene.gltf"));
+    // Model lightModel(FileSystem::getPath("resources/objects/scifi_hexsphere/scene.gltf"));
     Model sphereModel(FileSystem::getPath("resources/objects/scifi_hexsphere/scene.gltf"));
 
     
     // draw in wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // check the max quantity of uniform vectors available
     int maxUniformVectors;
     glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS, &maxUniformVectors);
 
     // render loop
-    // -----------
     while (!glfwWindowShouldClose(window))
     {
         // per-frame time logic
-        // --------------------
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         // input
-        // -----
         processInput(window);
 
+        // color 
+        float red = glm::abs(sin(glfwGetTime()));
+        red = red > 0.9f ? 0.9f : red < 0.55f ? 0.55f : red;
+
         // render
-        // ------
-        glClearColor(0.02f, 0.02f, 0.02f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 0.5f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // variables
@@ -158,11 +152,8 @@ int main()
         sphereShader.use();
         sphereShader.setVec3("viewPos", camera.Position);
 
-        float red = glm::abs(sin(glfwGetTime()));
-        red = red > 0.8f ? 0.8f : red < 0.15f ? 0.15f : red;
-
         // ****** LIGHT
-        glm::vec3 lightColor(red, 0.0f, 0.0f);
+        glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
         glm::vec3 diffuseColor = lightColor   * glm::vec3(0.15f); // decrease the influence
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.08f); // low influence
 
@@ -197,8 +188,11 @@ int main()
         for (int i = 0; i < NR_SPHERES; i++) 
         {
             glm::vec3 spherePos = *(spherePositions + i);
-            spherePos.y += sin(glfwGetTime() + i); // diagonal
+            float y = sin(glfwGetTime() + glm::ceil(glm::sqrt(i))); // diagonal
+            spherePos.y += sin(glfwGetTime() - (i * 5));
+            // spherePos.y += sin(glfwGetTime() + i); // diagonal
             // spherePos.y += sin(glfwGetTime() + i / NR_SPHERE_ROW); // horizonal
+            
 
             model = glm::mat4(1.0f);
             model = glm::rotate(model, rotationAngle, glm::vec3(0, 1, 0));
@@ -209,36 +203,36 @@ int main()
         }
 
         // draw the light sources
-        float lightScaleFactor = 0.045f;
-        for (int i = 0; i < NR_LIGHTS; i++)
-        {
-            glm::vec3 lightPos = *(lightPositions + i);
-
-            lightShader.use();
-            lightShader.setVec3("lightColor", lightColor);
-            lightShader.setMat4("projection", projection);
-            lightShader.setMat4("view", view);
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, lightPos);
-            model = glm::scale(model, glm::vec3(lightScaleFactor));
-            lightShader.setMat4("model", model);
-            lightModel.Draw(lightShader);
-        }
+        // float lightScaleFactor = 0.045f;
+        // for (int i = 0; i < NR_LIGHTS; i++)
+        // {
+        //     glm::vec3 lightPos = *(lightPositions + i);
+        //     lightShader.use();
+        //     lightShader.setVec3("lightColor", lightColor);
+        //     lightShader.setMat4("projection", projection);
+        //     lightShader.setMat4("view", view);
+        //     model = glm::mat4(1.0f);
+        //     model = glm::translate(model, lightPos);
+        //     model = glm::scale(model, glm::vec3(lightScaleFactor));
+        //     lightShader.setMat4("model", model);
+        //     lightModel.Draw(lightShader);
+        // }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
     glfwTerminate();
+
+    free(lightPositions);
+    free(spherePositions);
+
     return 0;
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -255,7 +249,6 @@ void processInput(GLFWwindow *window)
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -264,7 +257,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 // glfw: whenever the mouse moves, this callback is called
-// -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     if (firstMouse)
@@ -284,8 +276,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
+}
+
+string genLightPositionString(int i, std::string prop) {
+    string number = to_string(i);
+    return ("lights[" + number + "]." + prop).c_str();
 }
