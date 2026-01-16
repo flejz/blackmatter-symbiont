@@ -1,3 +1,54 @@
+# Blackmatter Symbiont
+
+An OpenGL 3D visualization project featuring animated spheres with dynamic lighting.
+
+## Dependencies
+
+- GLFW3
+- GLEW
+- GLM
+- Assimp
+
+On Arch/Manjaro:
+```bash
+sudo pacman -S glfw glew glm assimp
+```
+
+On Ubuntu/Debian:
+```bash
+sudo apt install libglfw3-dev libglew-dev libglm-dev libassimp-dev
+```
+
+## Building
+
+Using CMake:
+```bash
+mkdir build && cd build
+cmake ..
+make
+```
+
+Or manually with g++:
+```bash
+g++ -o main ./main.cpp ./include/stb_image.cpp $(pkg-config --libs glfw3 assimp glew)
+```
+
+## Running
+
+```bash
+./build/blackmatter-symbiont
+```
+
+Controls:
+- WASD - Move camera
+- Mouse - Look around
+- Scroll - Zoom
+- ESC - Exit
+
+---
+
+## Resources
+
 https://docs.gl
 https://learnopengl.com/
 
