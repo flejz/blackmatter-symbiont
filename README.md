@@ -2,7 +2,7 @@
 
 A learning project for OpenGL, built following the [LearnOpenGL](https://learnopengl.com/) course. Simulates the [Dark Matter Berlin](https://www.youtube.com/shorts/UO4CBT2sjGQ) kinetic sphere installation — a grid of suspended spheres moving in coherent wave patterns.
 
-<video src="https://raw.githubusercontent.com/flejz/blackmatter-symbiont/main/demo.mp4" controls width="100%"></video>
+![Demo](demo.gif)
 
 ## Inspiration
 
