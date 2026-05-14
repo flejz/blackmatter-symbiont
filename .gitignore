@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# Build output
+build/
+
+# Editor / LSP caches
+.cache/
+
+# Claude Code instructions (local only)
+CLAUDE.md
