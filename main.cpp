@@ -15,7 +15,7 @@
 #define NR_LIGHT_ROW 39
 #define NR_LIGHT_MID NR_LIGHT_ROW / 2
 #define NR_LIGHTS NR_LIGHT_ROW * NR_LIGHT_ROW
-#define NR_SPHERE_ROW 13
+#define NR_SPHERE_ROW 10
 #define NR_SPHERE_MID NR_SPHERE_ROW / 2
 #define NR_SPHERES NR_SPHERE_ROW * NR_SPHERE_ROW
 #define SCR_WIDTH 1920
@@ -105,6 +105,11 @@ int main()
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
     stbi_set_flip_vertically_on_load(true);
 
+    // set initial viewport to actual framebuffer size
+    int fbWidth, fbHeight;
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    glViewport(0, 0, fbWidth, fbHeight);
+
     // configure global opengl state
     glEnable(GL_DEPTH_TEST);
 
@@ -144,7 +149,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // variables
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)fbWidth / (float)fbHeight, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 model;
 
@@ -188,10 +194,10 @@ int main()
         for (int i = 0; i < NR_SPHERES; i++) 
         {
             glm::vec3 spherePos = *(spherePositions + i);
-            float y = sin(glfwGetTime() + glm::ceil(glm::sqrt(i))); // diagonal
-            spherePos.y += sin(glfwGetTime() - (i * 5));
-            // spherePos.y += sin(glfwGetTime() + i); // diagonal
-            // spherePos.y += sin(glfwGetTime() + i / NR_SPHERE_ROW); // horizonal
+            int row = i / NR_SPHERE_ROW, col = i % NR_SPHERE_ROW;
+            float dist = glm::length(glm::vec2(row - NR_SPHERE_MID, col - NR_SPHERE_MID));
+            // spherePos.y += sin(glfwGetTime() - dist * 0.8f); // option A: radial ripple from center
+            spherePos.y += sin(glfwGetTime() - row * 0.5f - col * 0.5f); // option B: diagonal wave
             
 
             model = glm::mat4(1.0f);
