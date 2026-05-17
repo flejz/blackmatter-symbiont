@@ -1,4 +1,4 @@
-# Blackmatter Symbiont
+# Darkmatter Symbiont
 
 A learning project for OpenGL, built following the [LearnOpenGL](https://learnopengl.com/) course. Simulates the [Dark Matter Berlin](https://www.youtube.com/shorts/UO4CBT2sjGQ) kinetic sphere installation — a grid of suspended spheres moving in coherent wave patterns.
 
@@ -34,7 +34,7 @@ cmake --build build
 **Run** (from project root — shaders load relative to cwd)
 
 ```bash
-./build/blackmatter-symbiont
+./build/darkmatter-symbiont
 ```
 
 **Controls**

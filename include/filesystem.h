@@ -19,7 +19,7 @@ private:
     static char const *envRoot = getenv("LOGL_ROOT_PATH");
     static char const *givenRoot =
         (envRoot != nullptr ? envRoot
-                            : "/home/flejz/code/blackmatter-symbiont");
+                            : "/home/flejz/code/darkmatter-symbiont");
     static std::string root = (givenRoot != nullptr ? givenRoot : "");
     return root;
   }
