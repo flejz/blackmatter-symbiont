@@ -34,7 +34,7 @@ cmake --build build
 **Run** (from project root — shaders load relative to cwd)
 
 ```bash
-./build/blackmatter-symbiont
+./build/darkmatter-symbiont
 ```
 
 **Controls**
